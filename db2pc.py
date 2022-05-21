@@ -22,7 +22,7 @@ batch_size = 32
 df = pd.read_sql("Select * from movies", engine)
 df["combined_text"] = df["title"] + ": " + df["overview"].fillna('') + " -  " + df["tagline"].fillna('') + " Genres:-  " + df["genres"].fillna('')
 
-print(len(df["combined_text"].tolist()))
+print(f'Length of Combined Text: {len(df["combined_text"].tolist())}')
 
 for x in tqdm(range(0,len(df),batch_size)):
 	to_send = []
@@ -31,7 +31,7 @@ for x in tqdm(range(0,len(df),batch_size)):
 	embeddings = model.encode(sentences)
 	for idx, value in enumerate(trakt_ids):
 		to_send.append(
-			{
-				value: embeddings[idx].tolist()
-			})
+			(
+				str(value), embeddings[idx].tolist()
+			))
 	index.upsert(to_send)
