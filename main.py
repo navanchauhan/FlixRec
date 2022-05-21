@@ -79,13 +79,14 @@ engine, Session = init_db_stuff(database_url)
 
 start_time = datetime.now()
 
-for page in tqdm(range(2990,max_requests+10)):
+for page in tqdm(range(1,max_requests+10)):
 	if req_count == 999:
 		seconds_to_sleep = 300 - (datetime.now() - start_time).seconds
 		if seconds_to_sleep < 1:
-			seconds_to_sleep = 100
+			seconds_to_sleep = 60
 		print(f"Sleeping {seconds_to_sleep}s")
 		# Need to respect their rate limitting
+        # Better to use x-ratelimit header
 		time.sleep(seconds_to_sleep)
 		start_time = datetime.now()
 		req_count = 0
