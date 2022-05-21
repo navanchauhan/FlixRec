@@ -34,4 +34,6 @@ for x in tqdm(range(0,len(df),batch_size)):
 			{
 				value: embeddings[idx]
 			})
+            
+	print(to_send)
 	index.upsert(to_send)
