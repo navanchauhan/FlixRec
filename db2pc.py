@@ -32,7 +32,7 @@ for x in tqdm(range(0,len(df),batch_size)):
 	for idx, value in enumerate(trakt_ids):
 		to_send.append(
 			{
-				value: embeddings[idx]
+				value: embeddings[idx].tolist()
 			})
             
 	print(to_send)
