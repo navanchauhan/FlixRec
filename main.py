@@ -39,22 +39,23 @@ params = {
 
 
 def create_movie_dict(movie: dict):
-	movie = {
-		"title": movie["movie"]["title"],
-		"overview": movie["movie"]["overview"],
-		"genres": movie["movie"]["genres"],
-		"language": movie["movie"]["language"],
-		"year": int(movie["movie"]["year"]),
-		"trakt_id": movie["movie"]["ids"]["trakt"],
-		"released": movie["movie"]["released"],
-		"runtime": int(movie["movie"]["runtime"]),
-		"country": movie["movie"]["country"],
-		"rating": int(movie["movie"]["rating"]),
-		"votes": int(movie["movie"]["votes"]),
-		"comment_count": int(movie["movie"]["comment_count"]),
-		"tagline": movie["movie"]["tagline"]
+	m = movie["movie"]
+	movie_dict = {
+		"title": m["title"],
+		"overview": m["overview"],
+		"genres": m["genres"],
+		"language": m["language"],
+		"year": int(m["year"]),
+		"trakt_id": m["ids"]["trakt"],
+		"released": m["released"],
+		"runtime": int(m["runtime"]),
+		"country": m["country"],
+		"rating": int(m["rating"]),
+		"votes": int(m["votes"]),
+		"comment_count": int(m["comment_count"]),
+		"tagline": m["tagline"]
 	}
-	return movie
+	return movie_dict
 
 
 
