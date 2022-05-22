@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Results {% endblock %}</h1>
+    <main>
+        {% for deet in deets %}
+        <h2>{{deet["title"]}} ({{deet["year"]}})</h2>
+        <i>{{deet["tagline"]}}</i> - <i>{{deet["runtime"]}} min</i>
+        <p>
+            {{deet["overview"]}}
+        </p>
+        {% endfor %}
+        <h3>Advance Filters</h3>
+        <form action="{{url_for('get_similar_titles')}}" method="GET">
+            <p><input type="hidden" name="trakt_id" value="{{deets[0]['trakt_id']}}"/></p>
+            <p>Minimum Year <input type="number" name="minYear" min="1900" max="2021" value="1900" /></p>
+            <p>Maximum Year <input type="number" name="maxYear" min="1900" max="2021" value="2021" /></p>
+            <p>Minimum Runtime <input type="number" name="minRuntime" min="1" value="70" /></p>
+            <p>Maximum Runtime <input type="number" name="maxRuntime" min="1" value="220" /></p>
+            <p><input type="hidden" name="filter" value="OwO" /> </p>
+            <p><input type="submit" value="Filter" /></p>
+        </form>
+    </main>
+{% endblock %}

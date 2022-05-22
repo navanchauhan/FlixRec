@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Multiple Results {% endblock %}</h1>
+    <p>Multiple results found, please select the correct movie title.</p>
+    <main>
+        {% for deet in deets %}
+        <h2>{{deet["title"]}} ({{deet["year"]}})</h2>
+        <p><a href={{url_for('get_similar_titles',trakt_id=deet['trakt_id'])}}>Select This One</a></p>
+        <p>
+            {{deet["overview"]}}
+        </p>
+        {% endfor %}
+    </main>
+{% endblock %}

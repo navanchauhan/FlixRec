@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Home {% endblock %}</h1>
+    <main>
+        <form action="/" method="POST">
+            <p>Enter Movie Title: <input type="text" name="title"></input></p>
+            <p><input type="submit" value="Search" /></p>
+        </form>
+    </main>
+    <footer>* General searches do not work well, try to be specific</footer>
+{% endblock %}
