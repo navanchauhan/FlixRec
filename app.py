@@ -177,3 +177,5 @@ def find_similar_title():
                 deets["trakt_id"] = trakt_id
                 results.append(deets)
             return render_template("same_titles.html", deets=results)
+    else:
+        return "Ayo! use GET or POST method only"
