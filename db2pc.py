@@ -20,18 +20,23 @@ model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 batch_size = 32
 
 df = pd.read_sql("Select * from movies", engine)
-df["combined_text"] = df["title"] + ": " + df["overview"].fillna('') + " -  " + df["tagline"].fillna('') + " Genres:-  " + df["genres"].fillna('')
+df["combined_text"] = (
+    df["title"]
+    + ": "
+    + df["overview"].fillna("")
+    + " -  "
+    + df["tagline"].fillna("")
+    + " Genres:-  "
+    + df["genres"].fillna("")
+)
 
 print(f'Length of Combined Text: {len(df["combined_text"].tolist())}')
 
-for x in tqdm(range(0,len(df),batch_size)):
-	to_send = []
-	trakt_ids = df["trakt_id"][x:x+batch_size].tolist()
-	sentences = df["combined_text"][x:x+batch_size].tolist()
-	embeddings = model.encode(sentences)
-	for idx, value in enumerate(trakt_ids):
-		to_send.append(
-			(
-				str(value), embeddings[idx].tolist()
-			))
-	index.upsert(to_send)
+for x in tqdm(range(0, len(df), batch_size)):
+    to_send = []
+    trakt_ids = df["trakt_id"][x : x + batch_size].tolist()
+    sentences = df["combined_text"][x : x + batch_size].tolist()
+    embeddings = model.encode(sentences)
+    for idx, value in enumerate(trakt_ids):
+        to_send.append((str(value), embeddings[idx].tolist()))
+    index.upsert(to_send)

@@ -10,7 +10,9 @@ from sqlalchemy import func
 movie_name = "Forrest Gump"
 
 with engine.connect() as conn:
-	movie_deets = select(movies_table).filter(func.lower(movies_table.columns.title)==func.lower(movie_name))
-	result = conn.execute(movie_deets)
-	for row in result:
-		print(row)
+    movie_deets = select(movies_table).filter(
+        func.lower(movies_table.columns.title) == func.lower(movie_name)
+    )
+    result = conn.execute(movie_deets)
+    for row in result:
+        print(row)

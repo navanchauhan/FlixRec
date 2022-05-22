@@ -10,57 +10,56 @@ import time
 trakt_id = os.getenv("TRAKT_ID")
 trakt_se = os.getenv("TRAKT_SE")
 
-max_requests = 5000 # How many requests do you want to make 
+max_requests = 5000  # How many requests do you want to make
 req_count = 0
 
 years = "1900-2021"
 page = 1
-extended = "full" # Required to get additional information 
-limit = "10" # No of entires per request
-languages = "en" # Limit to particular language
+extended = "full"  # Required to get additional information
+limit = "10"  # No of entires per request
+languages = "en"  # Limit to particular language
 
 api_base = "https://api.trakt.tv"
 database_url = "sqlite:///jlm.db"
 
 headers = {
-	"Content-Type": "application/json",
-	"trakt-api-version": "2",
-	"trakt-api-key": trakt_id
+    "Content-Type": "application/json",
+    "trakt-api-version": "2",
+    "trakt-api-key": trakt_id,
 }
 
 params = {
-	"query": "",
-	"years": years,
-	"page": page,
-	"extended": extended,
-	"limit": limit,
-	"languages": languages
+    "query": "",
+    "years": years,
+    "page": page,
+    "extended": extended,
+    "limit": limit,
+    "languages": languages,
 }
 
 
 def create_movie_dict(movie: dict):
-	m = movie["movie"]
-	movie_dict = {
-		"title": m["title"],
-		"overview": m["overview"],
-		"genres": m["genres"],
-		"language": m["language"],
-		"year": int(m["year"]),
-		"trakt_id": m["ids"]["trakt"],
-		"released": m["released"],
-		"runtime": int(m["runtime"]),
-		"country": m["country"],
-		"rating": int(m["rating"]),
-		"votes": int(m["votes"]),
-		"comment_count": int(m["comment_count"]),
-		"tagline": m["tagline"]
-	}
-	return movie_dict
-
+    m = movie["movie"]
+    movie_dict = {
+        "title": m["title"],
+        "overview": m["overview"],
+        "genres": m["genres"],
+        "language": m["language"],
+        "year": int(m["year"]),
+        "trakt_id": m["ids"]["trakt"],
+        "released": m["released"],
+        "runtime": int(m["runtime"]),
+        "country": m["country"],
+        "rating": int(m["rating"]),
+        "votes": int(m["votes"]),
+        "comment_count": int(m["comment_count"]),
+        "tagline": m["tagline"],
+    }
+    return movie_dict
 
 
 params["limit"] = 1
-res = requests.get(f"{api_base}/search/movie",headers=headers,params=params)
+res = requests.get(f"{api_base}/search/movie", headers=headers, params=params)
 total_items = res.headers["x-pagination-item-count"]
 
 print(f"There are {total_items} movies")
@@ -80,45 +79,54 @@ engine, Session = init_db_stuff(database_url)
 
 start_time = datetime.now()
 
-for page in tqdm(range(1,max_requests+10)):
-	if req_count == 999:
-		seconds_to_sleep = 300 - (datetime.now() - start_time).seconds
-		if seconds_to_sleep < 1:
-			seconds_to_sleep = 60
-		print(f"Sleeping {seconds_to_sleep}s")
-		# Need to respect their rate limitting
+for page in tqdm(range(1, max_requests + 10)):
+    if req_count == 999:
+        seconds_to_sleep = 300 - (datetime.now() - start_time).seconds
+        if seconds_to_sleep < 1:
+            seconds_to_sleep = 60
+        print(f"Sleeping {seconds_to_sleep}s")
+        # Need to respect their rate limitting
         # Better to use x-ratelimit header
-		time.sleep(seconds_to_sleep)
-		start_time = datetime.now()
-		req_count = 0
+        time.sleep(seconds_to_sleep)
+        start_time = datetime.now()
+        req_count = 0
 
-	params["page"] = page
-	params["limit"] = int(int(total_items)/max_requests)
-	movies = []
-	res = requests.get(f"{api_base}/search/movie",headers=headers,params=params)
+    params["page"] = page
+    params["limit"] = int(int(total_items) / max_requests)
+    movies = []
+    res = requests.get(f"{api_base}/search/movie", headers=headers, params=params)
 
-	if res.status_code == 500:
-		break
-	elif res.status_code == 200:
-		None
-	else:
-		print(f"OwO Code {res.status_code}")
+    if res.status_code == 500:
+        break
+    elif res.status_code == 200:
+        None
+    else:
+        print(f"OwO Code {res.status_code}")
 
-	for movie in res.json():
-		movies.append(create_movie_dict(movie))
+    for movie in res.json():
+        movies.append(create_movie_dict(movie))
 
-	with engine.connect() as conn:
-		for movie in movies:
-			with conn.begin() as trans:
-				stmt = insert(movies_table).values(
-					trakt_id=movie["trakt_id"], title=movie["title"], genres=" ".join(movie["genres"]),
-					language=movie["language"], year=movie["year"], released=movie["released"],
-					runtime=movie["runtime"], country=movie["country"], overview=movie["overview"],
-					rating=movie["rating"], votes=movie["votes"], comment_count=movie["comment_count"],
-					tagline=movie["tagline"])
-				try:
-					result = conn.execute(stmt)
-					trans.commit()
-				except IntegrityError:
-					trans.rollback()
-	req_count += 1
+    with engine.connect() as conn:
+        for movie in movies:
+            with conn.begin() as trans:
+                stmt = insert(movies_table).values(
+                    trakt_id=movie["trakt_id"],
+                    title=movie["title"],
+                    genres=" ".join(movie["genres"]),
+                    language=movie["language"],
+                    year=movie["year"],
+                    released=movie["released"],
+                    runtime=movie["runtime"],
+                    country=movie["country"],
+                    overview=movie["overview"],
+                    rating=movie["rating"],
+                    votes=movie["votes"],
+                    comment_count=movie["comment_count"],
+                    tagline=movie["tagline"],
+                )
+                try:
+                    result = conn.execute(stmt)
+                    trans.commit()
+                except IntegrityError:
+                    trans.rollback()
+    req_count += 1

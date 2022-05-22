@@ -5,7 +5,7 @@ from sqlalchemy import insert
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-#database_url = "sqlite:///jlm.db"
+# database_url = "sqlite:///jlm.db"
 
 meta = MetaData()
 
@@ -25,15 +25,17 @@ movies_table = Table(
     Column("votes", Integer),
     Column("comment_count", Integer),
     Column("tagline", String),
-    Column("embeddings", PickleType)
-
+    Column("embeddings", PickleType),
 )
+
 
 def init_db_stuff(database_url: str):
     engine = create_engine(database_url)
     meta.create_all(engine)
     Session = sessionmaker(bind=engine)
     return engine, Session
+
+
 """
     movie = {
         "title": movie["movie"]["title"],
